@@ -112,8 +112,7 @@ total 4
 
 ```
 
-### Main logs and their management
-#### File systems
+### File systems
 #### Task on creating a swap drive
 
 ```bash
