@@ -1,9 +1,10 @@
 ### Powershell scripting.
 #### Parameters / Conditions / Variables.
+#### Replacement script: edit a file with name passed as an environment variable - remove all lines that contain a substring passed as a parameter
+
 
 ```bash
 
-Replacement script: edit a file with name passed as an environment variable - remove all lines that contain a substring passed as a parameter
 
 in PowerShall:
 Set-ExecutionPolicy -Scope CurrentUser Unrestricted
