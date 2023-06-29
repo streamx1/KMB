@@ -55,3 +55,83 @@ Server started on the port 3000
 HELLO ANYBODY!
 
 ```
+
+#### Docker.
+#### Do the same application build but inside a docker container (local).
+
+```bash
+
+streamx1@ubuntu111:~$ sudo apt update
+
+streamx1@ubuntu111:~$ sudo apt install ca-certificates curl gnupg
+
+streamx1@ubuntu111:~$ sudo install -m 0755 -d /etc/apt/keyrings
+
+streamx1@ubuntu111:~$ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+
+streamx1@ubuntu111:~$ sudo chmod a+r /etc/apt/keyrings/docker.gpg
+
+streamx1@ubuntu111:~$ echo \
+  "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+  "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+streamx1@ubuntu111:~$ sudo apt update
+
+streamx1@ubuntu111:~$ sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+streamx1@ubuntu111:~$ sudo usermod -aG docker $USER
+
+--- reload terminal session
+
+streamx1@ubuntu111:~$ npm init
+
+streamx1@ubuntu111:~$ npm install
+
+
+--- dockerfile
+
+# Установка базового образа
+FROM node:14
+
+# Установка директории приложения
+WORKDIR /app
+
+# Копирование файлов приложения
+COPY package.json package-lock.json /app/
+COPY server.js /app/
+
+# Установка зависимостей
+RUN npm install
+
+# Открытие порта
+EXPOSE 3000
+
+# Запуск приложения
+CMD ["node", "server.js"]
+
+---
+
+streamx1@ubuntu111:~$ docker build -t dockercontainer.server.js:1 .
+
+streamx1@ubuntu111:~$ docker images
+REPOSITORY                  TAG       IMAGE ID       CREATED             SIZE
+dockercontainer.server.js   1         b9a0af8675fe   About an hour ago   1.1GB
+
+streamx1@ubuntu111:~$ docker run -p 3000:3000 dockercontainer.server.js:1
+
+
+--- run
+curl 127.0.0.0:3000
+
+--- output
+HELLO ANYBODY!
+
+```
+
+
+
+
+
+
+
