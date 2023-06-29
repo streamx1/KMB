@@ -56,8 +56,7 @@ HELLO ANYBODY!
 
 ```
 
-#### Docker.
-#### Do the same application build but inside a docker container (local).
+#### Docker. Do the same application build but inside a docker container (local).
 
 ```bash
 
