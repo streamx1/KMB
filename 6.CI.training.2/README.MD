@@ -130,7 +130,7 @@ HELLO ANYBODY!
 
 #### GitLab-CI. Create two jobs: docker build job (with previous build process) and a deployment job with docker run on the same EC2.
 
-
+```bash
 1. --- workflow docker.build.push.yaml
 
 
@@ -169,3 +169,5 @@ jobs:
 --- see pictures Docker_bild_1.png and Docker_bild_2.png
 
 2.
+
+```
