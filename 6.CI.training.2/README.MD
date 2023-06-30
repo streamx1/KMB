@@ -141,8 +141,6 @@ on:
     branches:
       - main
 
-#    tags:
-#      - '*'
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
