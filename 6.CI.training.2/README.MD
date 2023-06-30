@@ -128,9 +128,46 @@ HELLO ANYBODY!
 
 ```
 
+#### GitLab-CI. Create two jobs: docker build job (with previous build process) and a deployment job with docker run on the same EC2.
 
 
+1. --- workflow docker.build.push.yaml
 
 
+name: Build and Push Docker Image
+
+on:
+  push:
+    branches:
+      - main
+
+#    tags:
+#      - '*'
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Login to GHCR
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.KMB }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
 
 
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: true
+          tags: ghcr.io/streamx1/docker-image:latest
+
+
+--- see pictures Docker_bild_1.png and Docker_bild_2.png
+
+2.
