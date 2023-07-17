@@ -168,6 +168,122 @@ jobs:
 
 --- see pictures Docker_bild_1.png and Docker_bild_2.png
 
-2.
+2. install Docker on EC2
+
+ubuntu@ip-172-31-35-181:~$ sudo apt update
+
+ubuntu@ip-172-31-35-181:~$ sudo apt install ca-certificates curl gnupg
+
+ubuntu@ip-172-31-35-181:~$ sudo install -m 0755 -d /etc/apt/keyrings
+
+ubuntu@ip-172-31-35-181:~$ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+
+ubuntu@ip-172-31-35-181:~$ sudo chmod a+r /etc/apt/keyrings/docker.gpg
+
+ubuntu@ip-172-31-35-181:~$ echo \
+  "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+  "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+ubuntu@ip-172-31-35-181:~$ sudo apt update
+
+ubuntu@ip-172-31-35-181:~$ sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+ubuntu@ip-172-31-35-181:~$ sudo groupadd docker
+
+ubuntu@ip-172-31-35-181:~$ sudo usermod -aG docker $USER
+
+
+
+-- EC2 as runner:
+
+
+
+# Authentication
+
+√ Connected to GitHub
+
+# Runner Registration
+
+Enter the name of the runner group to add this runner to: [press Enter for Default]
+
+Enter the name of runner: [press Enter for ip-172-31-35-181]
+
+This runner will have the following labels: 'self-hosted', 'Linux', 'X64'
+Enter any additional labels (ex. label-1,label-2): [press Enter to skip]
+
+√ Runner successfully added
+√ Runner connection is good
+
+# Runner settings
+
+Enter name of work folder: [press Enter for _work]
+
+√ Settings Saved.
+
+--- ubuntu@ip-172-31-35-181:~/actions-runner$ ./run.sh
+
+√ Connected to GitHub
+
+Current runner version: '2.305.0'
+2023-07-17 10:54:44Z: Listening for Jobs
+Runner update in progress, do not shutdown runner.
+Downloading 2.306.0 runner
+Waiting for current job finish running.
+Generate and execute update script.
+Runner will exit shortly for update, should be back online within 10 seconds.
+Runner update process finished.
+Runner listener exit because of updating, re-launch runner after successful update
+Update finished successfully.
+Restarting runner...
+
+√ Connected to GitHub
+
+Current runner version: '2.306.0'
+2023-07-17 10:55:19Z: Listening for Jobs
+
+
+--- workflow docker.build.push.EC2.yaml
+
+
+name: Build and Push Docker Image EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-push:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Login to GHCR
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.KMB }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+
+      - name: Build and push Docker image EC2
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: true
+          tags: ghcr.io/streamx1/docker-image:latest
+
+
+--- see pictures: 
+ 
+Docker_bild_3_EC2.png
+Docker_bild_4_EC2.png
+Docker_bild_5_EC2.png
+Docker_bild_5_Packages.png
+
 
 ```
