@@ -287,3 +287,29 @@ Docker_bild_5_Packages.png
 
 
 ```
+
+#### AWS. Assign a Security Group to the EC2 to test the running app
+
+
+```bash
+
+-- set AWS security group
+
+step 1 - AWS.SG_1.png 
+step 2 - AWS.SG_2.png 
+step 3 - AWS.SG_3.png
+step 4 - AWS.SG_4.png
+
+
+-- start docker container
+
+ubuntu@ip-172-31-35-181:~/docker.ec2$ docker run -p 3000:3000 dockercontainer.server.js:1
+Server started on the port 3000
+
+
+-- start browser http://18.195.166.4:3000/
+HELLO ANYBODY!
+
+```
+
+
