@@ -1,0 +1,54 @@
+name: CI/CD
+
+on:
+  push:
+    tags:
+      - 'v*'   # teg for prod
+      - 's*'   # teg for staging
+      - 'd*'   # teg for dev'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Run tests
+      run: npm test
+
+  deploy_to_dev:
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/d')
+
+    steps:
+    - name: Deploy to Dev
+      # Insert code for deploiment dev
+
+  deploy_to_staging:
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/s')
+
+    steps:
+    - name: Deploy to Staging
+      # Insert code for deploiment staging
+
+  deploy_to_prod:
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+
+    steps:
+    - name: Deploy to Production
+      # Insert code for deploiment prod
