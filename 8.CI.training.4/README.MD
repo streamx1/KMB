@@ -1,4 +1,4 @@
-### 8. CI training 4. AWS. Linux, SSH.
+### 8.1 CI training 4. AWS. Linux, SSH.
 #### Create ECR, create an additional EC2, create new user on all EC2s for the gitlab runner, implement SSH access from the new EC2 to the previously created EC2s, provide appropriate access from all EC2s to the ECR.
 
 ```bash
@@ -204,5 +204,117 @@ AWS_ECR_2.png
 AWS_ECR_3.png
 AWS_ECR_4.png
 AWS_ECR_5.png
+
+```
+
+### 8.2 CI training 4. GitLab-CIH.
+#### Install an agent on the new EC2 and configure it to use the new user and connect to the other EC2s via SSH, remove previously installed agents on those EC2s, update created jobs to build the docker images on the new EC2 and to deploy them on the other EC2s.
+
+```bash
+
+--- install github action agent on new EC2.ADD:
+
+git clone git@github.com:streamx1/KMB.AWS.git
+"install" NodeJS
+"install" Docker
+
+-- Script server.js for NodeJS
+
+// Подключаем модуль http
+const http = require('http');
+
+// Создаем сервер
+const server = http.createServer((req, res) => {
+  res.statusCode = 200;
+  res.setHeader('Content-Type', 'text/plain');
+  res.end('HELLO ANYBODY!');
+});
+
+// Задаем порт для прослушивания
+const port = 3000;
+
+// Запускаем сервер
+server.listen(port, () => {
+  console.log(`Server started on the port ${port}`);
+});
+
+-- Start
+
+ubuntu@ip-172-31-35-7:~/nodejs$ node server.js
+
+-- Output in command line:
+Server started on the port 3000
+
+-- Output in browser http://18.197.32.199:3000/  
+HELLO ANYBODY!
+
+-- Output on other EC2.STAGING 
+
+git-run@ip-172-31-25-222:~$ curl http://18.197.32.199:3000/
+HELLO ANYBODY!
+
+
+
+--- for deploy on other EC2.STAGING create workflow :
+git-run@ip-172-31-21-220:~/KMB.AWS/.github/workflows$ nano docker.build.push.EC2.yaml
+
+
+name: Build and Deploy Docker Image
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Login to GHCR
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.KMBFORAWS }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: true
+          tags: ghcr.io/streamx1/docker-image:latest
+
+      # Add deployment steps for first EC2 instances
+      - name: Deploy to EC2 Instance 1
+        uses: appleboy/ssh-action@master
+        with:
+          host: 18.184.210.43
+          username: git-run
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            docker stop container_server3000 || true
+            docker rm container_server3000 || true
+            echo ${{ secrets.KMBFORAWS }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+            docker pull ghcr.io/streamx1/docker-image:latest
+            docker run -d --name container_server3000 -p 3000:3000 ghcr.io/streamx1/docker-image:latest
+
+      # Add deployment steps for other EC2 instances: same
+
+---
+
+OUTPUT in browser from external IP EC2.STAGING: 
+http://18.184.210.43:3000/
+HELLO ANYBODY!
+
+see next screenshot:
+ 
+AWS_EC2_CI_1.png
+AWS_EC2_CI_2.png
+AWS_EC2_CI_3.png
 
 ```
